@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Wireless Home Appliance's Controller</title>
+	<script type="text/javascript">
+		function toggleVisibility(elem){
+			document.getElementById(elem).style.visibility = document.getElementById(elem).style.visibility=='hidden'?'visible':'hidden';
+		}
+		function setup(elem) {
+			document.getElementById(elem).style.visibility = 'hidden'
+		}
+		function restricLive(input,pattern) {
+			if(input.value.match(pattern)==null)
+				input.style.backgroundColor="red";
+			else input.style.backgroundColor="";
+		}
+		function restricChange(input,pattern) {
+			if(input.value.match(pattern)==null){
+				input.style.backgroundColor="red";
+				document.getElementById("submit").disabled=true;
+			}else{
+				var xhr = new XMLHttpRequest();
+				xhr.onreadystatechange=function() {
+					if(this.readyState == 4 && this.status==200){
+						input.style.backgroundColor="green";
+						document.getElementById("submit").disabled=false;
+					}else{
+						input.style.backgroundColor="red";
+						document.getElementById("submit").disabled=true;
+					}
+				}
+				xhr.open('POST','http://192.168.4.1/settings/isauthentified',true);
+				xhr.send(input.value);
+			}
+		}
+		function sendJson(data) {
+			var xhr = new XMLHttpRequest();
+			xhr.onreadystatechange = function(){
+				if(this.readyState==4){
+					if (this.status==200)
+						document.getElementById("change-label").innerHTML='<h4 style="color:green;">Changes are saved successfully and will be applied once the device restart.</h4>';
+					else if(this.status==204){
+						document.getElementById("change-label").innerHTML='<h4 style="color:green;">Changes are saved successfully and applying. You may connect your device again.</h4><br>Restarting:<progress id="progress" value="0" max="100" width="200px"></progress>';
+						restartAnim();
+					}
+					else if(this.status==403)
+						document.getElementById("change-label").innerHTML='<h4 style="color:red;">Changes are failed to save.</h4>';
+				}
+			}
+			xhr.open('POST',"http://192.168.4.1/settings/change",true);
+			xhr.send(JSON.stringify(data));
+		}
+		function restartAnim(){
+			var i=0;
+			var j=setInterval(function(){
+				if(i<5)
+					document.getElementById('progress').value+=20;
+				else clearInterval(j);
+				i++;},1000);
+		}
+		function createJsonData(checkboxarray) {
+			var data={};
+			for (var i = 0; i < checkboxarray.length; i++) {
+				var elemsarray=document.getElementById(document.getElementById(checkboxarray[i]).value).childNodes;
+				for( var j=0; j<elemsarray.length; j++){
+					if(elemsarray[j].value!=undefined){
+						data[elemsarray[j].id]=document.getElementById(checkboxarray[i]).checked?elemsarray[j].value:'';
+					}
+				}
+			}
+			data['devicestatus']=document.querySelector('input[name=devicestatus]:checked').value;
+			return data;
+		}
+		function isCredentialsOkay(checkboxarray){
+			var okay = true;
+			for (var i = 0; i < checkboxarray.length; i++) {
+				if(document.getElementById(checkboxarray[i]).checked){
+					var elemsarray=document.getElementById(document.getElementById(checkboxarray[i]).value).childNodes;
+					for (var j = 0 ; j < elemsarray.length; j++) {
+						if(elemsarray[j].value!=undefined)
+						{
+							if (elemsarray[j].value=="") {
+								elemsarray[j].style.backgroundColor="red";
+								okay=false;
+							}else{
+								if(elemsarray[j].style.backgroundColor=="red")
+									okay=false;
+							}
+						}
+					}
+				}
+			}
+			if(okay){
+				sendJson(createJsonData(checkboxarray));
+			}else alert("Error: Please check all the neccessary credentials");
+		}
+	</script>
+</head>
+<body onload="restricChange(document.getElementById('currentpassword'),/^[^\n\r]{8,30}$/gi);setup('loginiddiv');setup('loginpwddiv');setup('apssiddiv');setup('appwddiv');setup('dnsdiv');setup('emailiddiv');">
+<div class="options">
+	<a href="/home">Home</a>
+	<a href="/settings">Settings</a>
+	<a href="/login?logout=1">Log out</a>
+	<a href="/about">About</a>
+</div>
+<br><h3>Change the neccessary credentials for network connections.</h3>
+<div class="settings-form">
+	<input type="checkbox" id="chkloginid" value="loginiddiv" onchange="toggleVisibility(this.value)">Change Your Login ID
+	<div id="loginiddiv">
+		<input type="text" id="login_id" placeholder="Enter new Login ID" onkeyup="restricLive(this,/^[\w]{5,20}$/gi)">
+	</div>
+	
+	<input type="checkbox" id="chkloginpwd" value="loginpwddiv" onchange="toggleVisibility(this.value)">Change Login Password
+	<div id="loginpwddiv">
+		<input type="password" id="login_pwd" placeholder="Enter new Login password" onkeyup="restricLive(this,/^[^\n\r]{8,30}$/gi)"><br>
+	</div>
+
+	<input type="checkbox" id="chkapssid" value="apssiddiv" onchange="toggleVisibility(this.value)">Change AP SSID
+	<div id="apssiddiv">
+		<input type="text" id="apssid" placeholder="Enter new AP SSID" onkeyup="restricLive(this,/^[^\n\r]{3,20}$/gi)"><br>
+	</div>
+
+	<input type="checkbox" id="chkappwd" value="appwddiv" onchange="toggleVisibility(this.value)">Change AP Password
+	<div id="appwddiv">
+		<input type="password" id="appwd" placeholder="Enter new AP password" onkeyup="restricLive(this,/^[^\n\r]{8,30}$/gi)"><br>
+	</div>
+
+	<input type="checkbox" id="chkdns" value="dnsdiv" onchange="toggleVisibility(this.value)">Change Domain Name
+	<div id="dnsdiv">
+		<input type="text" id="dns_name" placeholder="Enter new domain name" onkeyup="restricLive(this,/^[\w]+([\.][\w]+)*$/gi)"><br>
+	</div>
+
+	<input type="checkbox" id="chkemailid" value="emailiddiv" onchange="toggleVisibility(this.value)">Change Admin Email ID
+	<div id="emailiddiv">
+		<input type="email" id="email_id" placeholder="Enter your new Email ID" onkeyup="restricLive(this,/^[\w]+([\.][\w]+)*[\@][\w]+([\.][\w]+)+$/gi)"><br>
+	</div>
+
+	<div id="devicestatusdiv">
+		<input type="radio" value="restart" name="devicestatus" checked>Restart Your Device<br>
+		<input type="radio" value="nexttime" name="devicestatus">Change and Apply Later<br>
+	</div>
+
+	<div id="finaldiv">
+		<input type="password" id="currentpassword" placeholder="Enter current password" autocomplete="off" onkeyup="restricChange(this,/^[^\n\r]{8,30}$/gi)"><br>
+		<input type="submit" id="submit" onclick="isCredentialsOkay(['chkloginid','chkloginpwd','chkapssid','chkappwd','chkdns','chkemailid'])" value="Change"><br>
+	</div>
+	<div id="change-label"></div>
+</div>
+</body>
+</html>

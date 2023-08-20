@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Wireless Home Appliance's Controller</title>
+	<script type="text/javascript">
+		var appliances={ids:[]};
+		function deleteAppliance(input) {
+			var nodes=input.parentNode.parentNode.childNodes;
+			for(var i=0;i<nodes.length;i++)
+			{	
+				if(nodes[i].id==input.value){
+					delete appliances[input.parentNode.parentNode.id.substring(11)][input.parentNode.firstChild.id];
+					input.parentNode.parentNode.removeChild(nodes[i]);
+				}
+			}
+		}
+		function toggleAppliance(input) {
+			var roomByte=0;
+			var nodes=input.parentNode.parentNode.childNodes;
+			for(var i=0;i<nodes.length;i++)
+				roomByte+=Number(nodes[i].childNodes[0].checked)*Math.pow(2,7-i);
+			appliances[input.parentNode.parentNode.parentNode.parentNode.querySelector('input[name=room]:checked').id]=roomByte;
+			var xhr=new XMLHttpRequest();
+			xhr.open('POST','http://192.168.4.1/home/stateappliances',true);
+			xhr.send(JSON.stringify(appliances));
+		}
+		function addNewAppliance(elem_id) {
+			var appliance_id = window.prompt("Enter ID of Appliance","Appliance");
+			if(appliance_id!=null && appliance_id!=''){
+				var nodes = document.getElementById(elem_id).childNodes;
+				var flag=true;
+				for(var i=0;i<nodes.length;i++){
+					if(nodes[i].id==appliance_id+'-div'){
+						flag=false;
+						break;
+					}
+				}
+				if(flag){
+					var room_id = elem_id.substring(11);
+					var input = document.getElementById(elem_id);
+					input.innerHTML+='<div id="'+appliance_id+'-div"><input type="checkbox" id="'+appliance_id+'" onchange="toggleAppliance(this);" value="appliance-'+appliance_id+'">'+appliance_id+'<button id="delete-appliance-button-'+appliance_id+'" value="'+appliance_id+'-div" onclick="deleteAppliance(this);">Delete Appliance</button></div>';
+					var stateInBin=("00000000"+appliances[room_id].toString(2)).slice(-8);
+					for(var i=0;i<nodes.length-1;i++)
+						nodes[i].firstChild.checked=stateInBin[i]=='1'?true:false;
+				}else alert("Error: The Appliance ID [:"+appliance_id+"] is already registered.");
+			}
+		}
+		var prevRoom = null;
+		function deleteRoom(room) {
+			var child=document.getElementsByClassName(room);
+			if(document.getElementById(room.substring(5)).checked) prevRoom=null;
+			child[0].parentNode.removeChild(child[0]);
+			var room_id = room.substring(5);
+			delete appliances[room_id];
+			for(var room_index=0;room_index<appliances.ids.length;room_index++){
+				if(appliances.ids[room_index]==room_id){
+					appliances.ids.splice(room_index,1);
+				}
+			}
+		}
+		function changeVisibility(elem_id){
+			var input=document.getElementsByClassName(elem_id);
+			input[0].style.visibility='visible';
+			if(prevRoom!=null) prevRoom[0].style.visibility='hidden';
+			prevRoom=input;
+		}
+		function addNewRoom() {
+			if(prevRoom!=null) prevRoom[0].style.visibility='hidden';
+			var room_id = window.prompt("Enter ID of room","Room");
+			if(room_id!='' && room_id!=null){
+				if(!document.getElementsByClassName('room-'+room_id).length){
+					var rooms=document.getElementsByClassName('container-rooms');
+					rooms[0].innerHTML+='<div class="room-'+room_id+'"><input type="radio" name="room" value="'+room_id+'-board" id="'+room_id+'" onchange="changeVisibility(this.value);" checked>'+room_id+'<button id="delete-room-buttom-'+room_id+'" onclick="deleteRoom(\'room-'+room_id+'\');">Delete Room</button><br><div class="'+room_id+'-board"><button value="appliances-'+room_id+'" id="add-appliance-button-'+room_id+'" onclick="addNewAppliance(this.value);">Add New Appliance</button><br><div id="appliances-'+room_id+'"></div></div></div>';
+					prevRoom=document.getElementsByClassName(room_id+'-board');
+					var nodes=rooms[0].childNodes;
+					for(var i=0;i<nodes.length-1;i++){
+						var stateInBin=("00000000"+appliances[nodes[i].className.substring(5)].toString(2)).slice(-8);
+						var subnodes=nodes[i].childNodes[4].childNodes[2].childNodes;
+						for(var j=0;j<subnodes.length;j++)
+							subnodes[j].firstChild.checked=stateInBin[j]=='1'?true:false;
+					}
+					appliances.ids.push(room_id);
+					appliances[room_id]=0;
+				}else{
+					alert("Error: The Room ID [:"+room_id+"] is already registered.");
+					prevRoom[0].style.visibility='visible';
+				}
+			}
+		}
+	</script>
+</head>
+<body>
+<div class="options-container">
+	<a href="/home">Home</a>
+	<a href="/settings">Settings</a>
+	<a href="/login?logout=1">Log out</a>
+	<a href="/about">About</a>
+</div>
+<div id="adding-home">
+	<input type="button" value="Add New Room" id="add-room" onclick="addNewRoom();">
+</div>
+<div class="container-rooms"></div>
+<div id="status-of-changed-appliance"></div> 
+</body>
+</html>
