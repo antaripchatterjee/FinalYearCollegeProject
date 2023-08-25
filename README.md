@@ -27,7 +27,7 @@ Group - 1, ECE (2014-18)\
 ### Things we had to buy
 * **NodeMCU with ESP8266 microcontroller** (Yep, we were supposed to write codes in lua but who cared? 😒 We flashed our own firmware.) 
 * **IC 74HC595** (16 PINs SIPO shift register)
-* **5V/9V DC OUT adapter** (Did not have time and money to make our own. 😐)
+* **5V/9V DC OUT adapter** (Did not have time to make our own. 😐)
 * **AC relay switches** (Some type of automatic electrical switch though don't know how it works but it worked and nobody cared again. 😶)
 * **PCB board** (I do not have to explain anything. 🙃)
 * **IC holders** (Some smarta** decisions 😎 or nerd like 🤓)
