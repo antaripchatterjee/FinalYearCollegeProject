@@ -21,7 +21,7 @@
 				roomByte+=Number(nodes[i].childNodes[0].checked)*Math.pow(2,7-i);
 			appliances[input.parentNode.parentNode.parentNode.parentNode.querySelector('input[name=room]:checked').id]=roomByte;
 			var xhr=new XMLHttpRequest();
-			xhr.open('POST','http://192.168.4.1/home/stateappliances',true);
+			xhr.open('POST','/home/stateappliances',true);
 			xhr.send(JSON.stringify(appliances));
 		}
 		function addNewAppliance(elem_id) {

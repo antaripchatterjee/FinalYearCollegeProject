@@ -29,7 +29,7 @@
 						document.getElementById("submit").disabled=true;
 					}
 				}
-				xhr.open('POST','http://192.168.4.1/settings/isauthentified',true);
+				xhr.open('POST','/settings/isauthentified',true);
 				xhr.send(input.value);
 			}
 		}
@@ -47,7 +47,7 @@
 						document.getElementById("change-label").innerHTML='<h4 style="color:red;">Changes are failed to save.</h4>';
 				}
 			}
-			xhr.open('POST',"http://192.168.4.1/settings/change",true);
+			xhr.open('POST',"/settings/change",true);
 			xhr.send(JSON.stringify(data));
 		}
 		function restartAnim(){
