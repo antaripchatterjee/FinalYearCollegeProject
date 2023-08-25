@@ -19,7 +19,7 @@ Group - 1, ECE (2014-18)\
 ### Distinctiveness
 
 * The best part about our project, it was very pocket friendly. It did not even cost us 1200 rupees including documentations.
-* Unlike any other teams who used ![bluetooth](https://github.com/antaripchatterjee/FinalYearCollegeProject/blob/master/bluetooth.png), we used ![Wi-Fi](https://github.com/antaripchatterjee/FinalYearCollegeProject/blob/master/wifi.png) as wireless network. We even tested our control range from almost 20 meters apart (did not measure).
+* Unlike any other teams who used ![bluetooth](https://github.com/antaripchatterjee/FinalYearCollegeProject/blob/master/bluetooth.png), whereas we used ![Wi-Fi](https://github.com/antaripchatterjee/FinalYearCollegeProject/blob/master/wifi.png) technology as wireless network. We even tested our control range from almost 20 meters apart (did not measure).
 * Scaling feature was one of the key factor for us. Spend just a little money to purchase a SIPO register and support eight more AC appliances. 
 
 > `Please do not fine me for using copyrighted images. I am not earning anything from this. 🤑`
