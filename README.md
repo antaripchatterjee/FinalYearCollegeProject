@@ -42,4 +42,4 @@ Do you expect a license for this? Well, there is none but you can check [this](h
 No, thank you! You can fork, clone or do whatever you want. Again nobody cares. 😶
 
 ### My thoughts
-Seeing this codebase now, I realise how far I have come and yet I feel proud as it was the tine I started my web development journey. It could have been much better if we would get some better guidance.
+Seeing this codebase now, I realise how far I have come and yet I feel proud as it was the time when I started my web development journey. It could have been much better if we would get some better guidance.
